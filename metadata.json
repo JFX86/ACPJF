@@ -1,0 +1,5 @@
+{
+  "name": "ARO",
+  "description": "Application de check-lists et données aéro. ARO doit se lire A.R.O. (aéro)",
+  "requestFramePermissions": []
+}
