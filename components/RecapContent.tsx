@@ -8,6 +8,14 @@ import { AircraftCard } from './AircraftCard';
 const RecapContent: React.FC = () => {
     type FilterType = TabId | 'ALL';
     const [filter, setFilter] = useState<FilterType>('ALL');
+    const [viewMode, setViewMode] = useState<'list' | 'table'>('list');
+    
+    React.useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth >= 1280) {
+            setViewMode('table');
+        }
+    }, []);
+
     const aircrafts = RECAP_DATA.map(a => a.id);
     const filteredData = filter === 'ALL' ? RECAP_DATA : RECAP_DATA.filter(d => d.id === filter);
     const title = "Récap'";
@@ -17,6 +25,30 @@ const RecapContent: React.FC = () => {
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-6 text-white tracking-wide">
                 {title}
             </h2>
+
+            {/* View Mode Toggle */}
+            <div className="flex justify-center gap-2 mb-6">
+                <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-4 py-1.5 text-sm font-bold transition-colors duration-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-opacity-75 ${
+                        viewMode === 'list'
+                            ? 'bg-blue-600 text-white ring-2 ring-blue-500 shadow-lg'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                    }`}
+                >
+                    Vue Liste
+                </button>
+                <button
+                    onClick={() => setViewMode('table')}
+                    className={`px-4 py-1.5 text-sm font-bold transition-colors duration-200 rounded-r-md focus:outline-none focus:ring-2 focus:ring-opacity-75 ${
+                        viewMode === 'table'
+                            ? 'bg-blue-600 text-white ring-2 ring-blue-500 shadow-lg'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                    }`}
+                >
+                    Vue Tableau
+                </button>
+            </div>
 
             {/* Filter Buttons */}
             <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -35,17 +67,17 @@ const RecapContent: React.FC = () => {
             {/* AIRCRAFT CONTENT */}
             {filteredData.length > 0 && (
                 <>
-                    {/* Mobile & Tablet Portrait View (Cards) */}
-                    <div className="xl:hidden space-y-6">
-                        {filteredData.map(plane => (
-                            <AircraftCard key={plane.id} plane={plane} />
-                        ))}
-                    </div>
-
-                    {/* Desktop & Tablet Landscape View (Table) */}
-                    <div className="hidden xl:block bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg shadow-xl overflow-x-auto">
-                        <AircraftTable data={filteredData} />
-                    </div>
+                    {viewMode === 'list' ? (
+                        <div className="space-y-6">
+                            {filteredData.map(plane => (
+                                <AircraftCard key={plane.id} plane={plane} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg shadow-xl overflow-x-auto w-full">
+                            <AircraftTable data={filteredData} />
+                        </div>
+                    )}
                 </>
             )}
         </div>
@@ -94,8 +126,8 @@ const AircraftTable: React.FC<{ data: AircraftRecap[] }> = ({ data }) => {
     };
 
     return (
-        <table className="w-full text-center text-[10px] whitespace-nowrap">
-            <thead className="bg-gray-700/80 text-[9px] uppercase tracking-wider">
+        <table className="w-full min-w-max text-center text-xs whitespace-nowrap">
+            <thead className="bg-gray-700/80 text-[10px] sm:text-xs uppercase tracking-wider">
                 <tr>
                     <th rowSpan={2} className="px-1 py-1 border-b border-r border-gray-600 leading-tight">Avion</th>
                     <th colSpan={5} className="px-1 py-1 border-b border-r border-gray-600 leading-tight">PARAMETRES</th>

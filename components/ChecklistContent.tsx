@@ -137,12 +137,28 @@ interface ChecklistSectionCardProps {
   isFirstSection?: boolean;
   onCheckPreviousSections?: () => void;
   resetTrigger?: number;
+  searchQuery?: string;
 }
 
-const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, sectionKeyPrefix, tabId, checkedState, itemStyles, itemRefs, onItemToggle, onSectionToggle, aircraftHighlightClasses, checkboxClasses, highlightTextColor, isFirstSection, onCheckPreviousSections, resetTrigger }) => {
+const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, sectionKeyPrefix, tabId, checkedState, itemStyles, itemRefs, onItemToggle, onSectionToggle, aircraftHighlightClasses, checkboxClasses, highlightTextColor, isFirstSection, onCheckPreviousSections, resetTrigger, searchQuery }) => {
   const sectionCheckboxRef = useRef<HTMLInputElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const prevIsAllChecked = useRef(false);
+
+  const sectionMatches = useMemo(() => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    if (section.title.toLowerCase().includes(q)) return true;
+    if (section.items?.some(i => i.item.toLowerCase().includes(q) || (i.action && i.action.toLowerCase().includes(q)))) return true;
+    if (section.subsections?.some(sub => sub.title.toLowerCase().includes(q) || sub.items?.some(i => i.item.toLowerCase().includes(q) || (i.action && i.action.toLowerCase().includes(q))))) return true;
+    return false;
+  }, [section, searchQuery]);
+
+  useEffect(() => {
+    if (searchQuery) {
+      setIsCollapsed(false);
+    }
+  }, [searchQuery]);
 
   const checkableItems = useMemo(() => {
     let items: { item: ChecklistItem; key: string }[] = [];
@@ -153,6 +169,7 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
           .filter(({ item }) => item.action === undefined && !item.isNote)
       );
     }
+
     if (section.subsections) {
       section.subsections.forEach((sub, subIndex) => {
         if (sub.items) {
@@ -183,9 +200,17 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
   useEffect(() => {
     if (isAllChecked && !prevIsAllChecked.current) {
        setIsCollapsed(true);
+       setTimeout(() => {
+         const sectionIndex = parseInt(sectionKeyPrefix, 10);
+         const nextSectionId = `section-${tabId}-${sectionIndex + 1}`;
+         const el = document.getElementById(nextSectionId);
+         if (el) {
+           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+         }
+       }, 150);
     }
     prevIsAllChecked.current = isAllChecked;
-  }, [isAllChecked]);
+  }, [isAllChecked, sectionKeyPrefix, tabId]);
 
   useEffect(() => {
     if (resetTrigger && resetTrigger > 0) {
@@ -194,6 +219,17 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
   }, [resetTrigger]);
 
   const allItemKeys = checkableItems.map(i => i.key);
+
+  if (!sectionMatches) {
+    return null;
+  }
+
+  const matchesSearch = (text: string) => {
+    if (!searchQuery) return true;
+    return text.toLowerCase().includes(searchQuery.toLowerCase());
+  };
+
+  const sectionTitleMatches = section.title && matchesSearch(section.title);
 
   return (
     <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg shadow-xl mb-8 transition-all duration-300">
@@ -234,7 +270,19 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
               onClick={(e) => e.stopPropagation()}
               className={`h-5 w-5 bg-gray-900 border-gray-600 focus:ring-offset-gray-800 rounded ${checkboxClasses ?? 'accent-blue-500 focus:ring-blue-500'}`}
               checked={isAllChecked}
-              onChange={() => onSectionToggle(allItemKeys, !isAllChecked)}
+              onChange={() => {
+                const goingToUncheck = isAllChecked;
+                onSectionToggle(allItemKeys, !isAllChecked);
+                if (goingToUncheck && isCollapsed) {
+                  setIsCollapsed(false);
+                  setTimeout(() => {
+                    const el = document.getElementById(`section-${tabId}-${sectionKeyPrefix.split('-')[0]}`);
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }, 150);
+                }
+              }}
               aria-label={`Cocher ou décocher tous les éléments pour ${section.title}`}
             />
           )}
@@ -245,6 +293,10 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
           {section.items && section.items.map((item, index) => {
              const itemKey = `${sectionKeyPrefix}-${index}`;
              const isCheckable = item.action === undefined && !item.isNote;
+             const itemMatches = sectionTitleMatches || matchesSearch(item.item) || (item.action && matchesSearch(item.action));
+             
+             if (!itemMatches) return null;
+
              return (
               <ChecklistItemRow
                 ref={el => { if (isCheckable) itemRefs.current[itemKey] = el; }}
@@ -259,30 +311,41 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
               />
             );
           })}
-          {section.subsections && section.subsections.map((sub, subIndex) => (
-             <div key={`sub-${subIndex}`} id={`section-${tabId}-${sectionKeyPrefix.split('-')[0]}-sub-${subIndex}`} className="mt-4 first:mt-0 scroll-mt-24">
-                <div className="bg-gray-700/40 text-blue-300 font-bold px-4 py-2 text-sm uppercase tracking-wide border-y border-gray-700/50">
-                    {sub.title}
-                </div>
-                {sub.items && sub.items.map((item, index) => {
-                  const itemKey = `${sectionKeyPrefix}-s${subIndex}-${index}`;
-                  const isCheckable = item.action === undefined && !item.isNote;
-                  return (
-                    <ChecklistItemRow
-                      ref={el => { if (isCheckable) itemRefs.current[itemKey] = el; }}
-                      key={`sub-item-${index}`}
-                      item={item}
-                      isChecked={checkedState[itemKey]}
-                      onToggle={isCheckable ? () => onItemToggle(itemKey) : undefined}
-                      highlightStyle={itemStyles[itemKey]}
-                      aircraftHighlightClasses={aircraftHighlightClasses}
-                      checkboxClasses={checkboxClasses}
-                      highlightTextColor={highlightTextColor}
-                    />
-                  );
-                })}
-             </div>
-          ))}
+          {section.subsections && section.subsections.map((sub, subIndex) => {
+             const subTitleMatches = sub.title && matchesSearch(sub.title);
+             const hasMatchingItems = sub.items?.some(i => matchesSearch(i.item) || (i.action && matchesSearch(i.action)));
+             
+             if (!sectionTitleMatches && !subTitleMatches && !hasMatchingItems) return null;
+
+             return (
+               <div key={`sub-${subIndex}`} id={`section-${tabId}-${sectionKeyPrefix.split('-')[0]}-sub-${subIndex}`} className="mt-4 first:mt-0 scroll-mt-24">
+                  <div className="bg-gray-700/40 text-blue-300 font-bold px-4 py-2 text-sm uppercase tracking-wide border-y border-gray-700/50">
+                      {sub.title}
+                  </div>
+                  {sub.items && sub.items.map((item, index) => {
+                    const itemKey = `${sectionKeyPrefix}-s${subIndex}-${index}`;
+                    const isCheckable = item.action === undefined && !item.isNote;
+                    const itemMatches = sectionTitleMatches || subTitleMatches || matchesSearch(item.item) || (item.action && matchesSearch(item.action));
+                    
+                    if (!itemMatches) return null;
+
+                    return (
+                      <ChecklistItemRow
+                        ref={el => { if (isCheckable) itemRefs.current[itemKey] = el; }}
+                        key={`sub-item-${index}`}
+                        item={item}
+                        isChecked={checkedState[itemKey]}
+                        onToggle={isCheckable ? () => onItemToggle(itemKey) : undefined}
+                        highlightStyle={itemStyles[itemKey]}
+                        aircraftHighlightClasses={aircraftHighlightClasses}
+                        checkboxClasses={checkboxClasses}
+                        highlightTextColor={highlightTextColor}
+                      />
+                    );
+                  })}
+               </div>
+             );
+          })}
         </div>
       )}
     </div>
@@ -307,6 +370,7 @@ const ChecklistContent: React.FC<ChecklistContentProps> = ({ data, recapData, ta
   const [showSkippedWarning, setShowSkippedWarning] = useState(false);
   const [skippedCount, setSkippedCount] = useState(0);
   const [resetTrigger, setResetTrigger] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const checkableItems = useMemo(() => {
@@ -518,10 +582,15 @@ const ChecklistContent: React.FC<ChecklistContentProps> = ({ data, recapData, ta
           </h2>
         )}
          {data.content.length > 0 && (
-            <div className="mt-4 flex justify-center items-center gap-4">
+            <div className="mt-4 flex justify-center items-center flex-nowrap w-full px-2 sm:px-0 gap-2 overflow-hidden">
+                {['BUBK', 'GIYA', 'GKQA', 'GLVX', 'HMPI', 'HNNY', 'HPPL'].includes(tabId) && (
+                    <span className="text-red-500 font-bold text-[10px] sm:text-sm whitespace-nowrap truncate">
+                        Ne remplace pas le manuel de vol ⚠
+                    </span>
+                )}
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex-shrink-0 px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white font-semibold text-sm rounded-lg shadow-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                    className="flex-shrink-0 px-2 py-1 sm:px-3 sm:py-1 bg-gray-600 hover:bg-gray-500 text-white font-semibold text-xs sm:text-sm rounded-lg shadow-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
                     aria-label="Réinitialiser la checklist"
                 >
                     Réinitialiser
@@ -537,11 +606,29 @@ const ChecklistContent: React.FC<ChecklistContentProps> = ({ data, recapData, ta
 
         {data.content.length > 0 && tabId !== 'PAX' && (
           <div className="mt-6 mb-8 text-left bg-gray-800/40 rounded-lg p-4 border border-gray-700/50">
-            <h4 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">Sommaire des sections</h4>
-            <div className="flex flex-wrap gap-2">
-              {data.content.map((section, index) => (
-                <React.Fragment key={index}>
-                  <button
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Sommaire des sections</h4>
+              <div className="relative w-full sm:w-64">
+                 <input 
+                   type="text" 
+                   value={searchQuery}
+                   onChange={e => setSearchQuery(e.target.value)}
+                   placeholder="Rechercher..."
+                   className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-1.5 pl-3 pr-8 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 />
+                 {searchQuery && (
+                   <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white" aria-label="Effacer la recherche">
+                     ×
+                   </button>
+                 )}
+              </div>
+            </div>
+            
+            {!searchQuery && (
+              <div className="flex flex-wrap gap-2">
+                {data.content.map((section, index) => (
+                  <React.Fragment key={index}>
+                    <button
                     onClick={() => {
                       const el = document.getElementById(`section-${tabId}-${index}`);
                       if (el) {
@@ -573,6 +660,7 @@ const ChecklistContent: React.FC<ChecklistContentProps> = ({ data, recapData, ta
                 </React.Fragment>
               ))}
             </div>
+            )}
           </div>
         )}
       </div>
@@ -598,6 +686,7 @@ const ChecklistContent: React.FC<ChecklistContentProps> = ({ data, recapData, ta
                 isFirstSection={index === 0}
                 onCheckPreviousSections={() => handleCheckPreviousSectionsRequest(index)}
                 resetTrigger={resetTrigger}
+                searchQuery={searchQuery}
               />
             </div>
           ))}
