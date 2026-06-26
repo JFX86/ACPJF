@@ -217,7 +217,7 @@ const App: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-gray-900 text-gray-200">
       <Header activeTab={activeTab} setActiveTab={handleTabChange} />
-      <main ref={mainContentRef} className="flex-1 overflow-y-auto">
+      <main ref={mainContentRef} className="flex-1 overflow-y-auto no-scrollbar">
         <div className="p-4 sm:p-6 md:p-8">
             {renderContent()}
         </div>

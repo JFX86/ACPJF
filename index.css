@@ -8,3 +8,12 @@ input[type="number"].no-spinners::-webkit-outer-spin-button {
 input[type="number"].no-spinners {
   -moz-appearance: textfield;
 }
+
+/* Masquer la barre de défilement verticale */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
