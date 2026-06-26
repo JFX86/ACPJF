@@ -32,13 +32,13 @@ const TabButton: React.FC<{
             : `text-gray-300 hover:bg-gray-700 hover:text-white ${focusClasses}`
         }`}
     >
-      {tabId === 'PARAMS' ? 'PARAMÈTRES' : tabId}
+      {tabId === 'PARAMS' ? 'SET' : tabId}
     </button>
   );
 };
 
 const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
-  const airplaneTabs = TABS.filter(t => !['PAX', 'PARAMS', 'RECAP', 'TARIFS', 'NAVS'].includes(t)).sort();
+  const airplaneTabs = TABS.filter(t => !['PAX', 'PARAMS', 'RECAP', 'TARIFS', 'NAVS', 'CONV'].includes(t)).sort();
   
   return (
     <header className="bg-gray-800 shadow-lg w-full z-10">
@@ -88,6 +88,12 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab }) => {
                 tabId='NAVS'
                 isActive={activeTab === 'NAVS'}
                 onClick={() => setActiveTab('NAVS')}
+              />
+              <div className="border-l border-gray-600 h-4 sm:h-6"></div>
+              <TabButton
+                tabId='CONV'
+                isActive={activeTab === 'CONV'}
+                onClick={() => setActiveTab('CONV')}
               />
               <div className="border-l border-gray-600 h-4 sm:h-6"></div>
               <TabButton

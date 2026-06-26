@@ -22,7 +22,7 @@ const FavoriteButton: React.FC<{
           : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:scale-105 hover:shadow-lg'
         }`}
     >
-      <span className="text-2xl">{tabId}</span>
+      <span className="text-2xl">{tabId === 'PARAMS' ? 'SET' : tabId}</span>
       {isFavorite && (
         <span className="block text-xs mt-2 opacity-90">(Favori actuel)</span>
       )}
@@ -31,8 +31,8 @@ const FavoriteButton: React.FC<{
 }
 
 const FavoritesContent: React.FC<FavoritesContentProps> = ({ currentFavorite, setFavorite }) => {
-  const aircraftOptions = TABS.filter(t => !['PARAMS', 'RECAP', 'TARIFS', 'NAVS'].includes(t)).sort();
-  const otherOptions: TabId[] = ['RECAP', 'TARIFS', 'NAVS', 'PARAMS'];
+  const aircraftOptions = TABS.filter(t => !['PARAMS', 'RECAP', 'TARIFS', 'NAVS', 'CONV'].includes(t)).sort();
+  const otherOptions: TabId[] = ['RECAP', 'TARIFS', 'NAVS', 'CONV', 'PARAMS'];
 
   const handleSelectFavorite = (tabId: TabId) => {
     // If the clicked tab is already the favorite, deselect it. Otherwise, set it as the new favorite.

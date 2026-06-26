@@ -1,12 +1,13 @@
 import type { TabId, ChecklistData, AircraftRecap, ChecklistSection } from './types';
 
-export const TABS: TabId[] = ['PAX', 'PARAMS', 'TARIFS', 'NAVS', 'RECAP', 'BUBK', 'GIYA', 'GKQA', 'GLVX', 'HMPI', 'HNNY', 'HPPL'];
+export const TABS: TabId[] = ['PAX', 'PARAMS', 'TARIFS', 'NAVS', 'CONV', 'RECAP', 'BUBK', 'GIYA', 'GKQA', 'GLVX', 'HMPI', 'HNNY', 'HPPL'];
 
 export const AIRCRAFT_COLORS: Partial<Record<string, { bg: string; text: string; ring: string; border: string; highlight?: string; checkbox?: string; tableHighlight?: string; highlightText?: string; }>> = {
   PAX: { bg: 'bg-teal-500', text: 'text-white', ring: 'ring-teal-400', border: 'border-teal-500', highlight: 'bg-teal-900/50 ring-2 ring-teal-500', checkbox: 'accent-teal-500 focus:ring-teal-500', tableHighlight: 'bg-teal-500/40', highlightText: 'text-teal-400' },
   PARAMS: { bg: 'bg-purple-600', text: 'text-white', ring: 'ring-purple-500', border: 'border-purple-500' },
   TARIFS: { bg: 'bg-emerald-600', text: 'text-white', ring: 'ring-emerald-500', border: 'border-emerald-500' },
   NAVS: { bg: 'bg-pink-300', text: 'text-pink-900', ring: 'ring-pink-200', border: 'border-pink-300', highlight: 'bg-pink-200/50 ring-2 ring-pink-300', checkbox: 'accent-pink-400 focus:ring-pink-400', tableHighlight: 'bg-pink-300/40', highlightText: 'text-pink-400' },
+  CONV: { bg: 'bg-indigo-600', text: 'text-white', ring: 'ring-indigo-500', border: 'border-indigo-500' },
   RECAP: { bg: 'bg-black', text: 'text-white', ring: 'ring-gray-400', border: 'border-gray-400' },
   BUBK: { bg: 'bg-orange-500', text: 'text-white', ring: 'ring-orange-400', border: 'border-orange-500', highlight: 'bg-orange-900/50 ring-2 ring-orange-500', checkbox: 'accent-orange-500 focus:ring-orange-500', tableHighlight: 'bg-orange-500/40', highlightText: 'text-orange-400' },
   GIYA: { bg: 'bg-green-500', text: 'text-white', ring: 'ring-green-400', border: 'border-green-500', highlight: 'bg-green-900/50 ring-2 ring-green-500', checkbox: 'accent-green-500 focus:ring-green-500', tableHighlight: 'bg-green-500/40', highlightText: 'text-green-400' },
@@ -1436,6 +1437,10 @@ export const CHECKLIST_DATA: Record<TabId, ChecklistData> = {
     'NAVS': {
         title: "Check-list Navs",
         content: navsChecklistContent,
+    },
+    'CONV': {
+        title: "Convertisseur",
+        content: [],
     },
     'RECAP': {
         title: "Récapitulatif Performances",

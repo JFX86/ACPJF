@@ -3,6 +3,7 @@ import Header from './components/Header';
 import ChecklistContent from './components/ChecklistContent';
 import RecapContent from './components/RecapContent';
 import TarifsContent from './components/TarifsContent';
+import ConverterContent from './components/ConverterContent';
 import ParamsContent from './components/ParamsContent';
 import { CHECKLIST_DATA, RECAP_DATA } from './constants';
 import type { TabId } from './types';
@@ -186,6 +187,9 @@ const App: React.FC = () => {
     }
     if (activeTab === 'TARIFS') {
       return <TarifsContent />;
+    }
+    if (activeTab === 'CONV') {
+      return <ConverterContent />;
     }
     if (activeTab === 'RECAP') {
       return <RecapContent />;

@@ -1,7 +1,7 @@
 // Fix: Import ReactNode to properly type component children/renderable content.
 import type { ReactNode } from 'react';
 
-export type TabId = 'PAX' | 'PARAMS' | 'TARIFS' | 'NAVS' | 'RECAP' | 'BUBK' | 'GIYA' | 'GKQA' | 'GLVX' | 'HMPI' | 'HNNY' | 'HPPL';
+export type TabId = 'PAX' | 'PARAMS' | 'TARIFS' | 'CONV' | 'NAVS' | 'RECAP' | 'BUBK' | 'GIYA' | 'GKQA' | 'GLVX' | 'HMPI' | 'HNNY' | 'HPPL';
 
 export interface ChecklistItem {
   item: string;
