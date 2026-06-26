@@ -36,6 +36,7 @@ const CATEGORIES: { id: Category; label: string; icon: string }[] = [
 
 const ConverterContent: React.FC = () => {
   const [category, setCategory] = useState<Category>('speed');
+  const [equivCategory, setEquivCategory] = useState<Category>('speed');
   const [inputValue, setInputValue] = useState<number | ''>(100);
   const [fromUnitId, setFromUnitId] = useState<string>('kt');
   const [toUnitId, setToUnitId] = useState<string>('kmh');
@@ -43,6 +44,7 @@ const ConverterContent: React.FC = () => {
   // Change default units when switching category
   const handleCategoryChange = (cat: Category) => {
     setCategory(cat);
+    setEquivCategory(cat);
     if (cat === 'speed') {
       setFromUnitId('kt');
       setToUnitId('kmh');
@@ -92,36 +94,36 @@ const ConverterContent: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-3 sm:p-6 text-white animate-fade-in pb-16">
-      <h2 className="text-2xl font-bold text-center text-indigo-400 uppercase tracking-wider mb-6">
+    <div className="max-w-3xl mx-auto p-2 sm:p-6 text-white animate-fade-in pb-12">
+      <h2 className="text-lg sm:text-2xl font-bold text-center text-indigo-400 uppercase tracking-wider mb-3 sm:mb-6">
         Convertisseur Aéronautique
       </h2>
 
       {/* Category Tabs */}
-      <div className="grid grid-cols-3 gap-2 mb-6 bg-gray-800/80 p-1.5 rounded-xl border border-gray-700">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4 sm:mb-6 bg-gray-800/80 p-1 rounded-xl border border-gray-700">
         {CATEGORIES.map(cat => (
           <button
             key={cat.id}
             onClick={() => handleCategoryChange(cat.id)}
-            className={`py-2 px-3 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-1.5 px-2 sm:py-2 sm:px-3 rounded-lg font-bold text-[11px] sm:text-sm transition-all flex items-center justify-center gap-1 sm:gap-1.5 ${
               category === cat.id
                 ? 'bg-indigo-600 text-white shadow-lg ring-2 ring-indigo-400'
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
             }`}
           >
             <span>{cat.icon}</span>
-            <span>{cat.label}</span>
+            <span className="truncate">{cat.label}</span>
           </button>
         ))}
       </div>
 
       {/* Main Converter Card */}
-      <div className="bg-gray-800/90 backdrop-blur-md p-4 sm:p-8 rounded-2xl border border-gray-700 shadow-2xl mb-10">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-4 md:gap-6 items-center">
+      <div className="bg-gray-800/90 backdrop-blur-md p-3 sm:p-8 rounded-2xl border border-gray-700 shadow-2xl mb-6 sm:mb-10">
+        <div className="grid grid-cols-[1fr,auto,1fr] gap-1.5 sm:gap-6 items-center">
           
           {/* FROM Input Box */}
-          <div className="bg-gray-900/80 p-4 sm:p-5 rounded-xl border border-gray-700/80 flex flex-col gap-2">
-            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          <div className="bg-gray-900/80 p-2.5 sm:p-5 rounded-xl border border-gray-700/80 flex flex-col gap-1.5 sm:gap-2 min-w-0">
+            <label className="text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wide truncate">
               Valeur à convertir
             </label>
             <input
@@ -129,13 +131,13 @@ const ConverterContent: React.FC = () => {
               value={inputValue}
               onChange={e => setInputValue(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="0"
-              className="w-full bg-transparent text-3xl font-extrabold text-white focus:outline-none no-spinners"
+              className="w-full bg-transparent text-xl sm:text-3xl font-extrabold text-white focus:outline-none no-spinners"
             />
-            <div className="pt-2 border-t border-gray-800">
+            <div className="pt-1.5 sm:pt-2 border-t border-gray-800">
               <select
                 value={fromUnitId}
                 onChange={e => setFromUnitId(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 text-indigo-300 font-bold rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full bg-gray-800 border border-gray-600 text-indigo-300 font-bold rounded-lg py-1.5 px-2 sm:py-2 sm:px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 truncate"
               >
                 {currentUnits.map(u => (
                   <option key={u.id} value={u.id}>
@@ -147,31 +149,31 @@ const ConverterContent: React.FC = () => {
           </div>
 
           {/* Swap Button */}
-          <div className="flex justify-center">
+          <div className="flex justify-center flex-shrink-0">
             <button
               onClick={handleSwap}
               title="Inverser les unités"
-              className="bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white p-3 rounded-full transition-all hover:scale-110 active:scale-95 shadow-md"
+              className="bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white p-2 sm:p-3 rounded-full transition-all hover:scale-110 active:scale-95 shadow-md"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 md:rotate-0 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
               </svg>
             </button>
           </div>
 
           {/* TO Output Box */}
-          <div className="bg-indigo-950/40 p-4 sm:p-5 rounded-xl border border-indigo-500/40 flex flex-col gap-2">
-            <label className="text-xs font-semibold text-indigo-300 uppercase tracking-wide">
+          <div className="bg-indigo-950/40 p-2.5 sm:p-5 rounded-xl border border-indigo-500/40 flex flex-col gap-1.5 sm:gap-2 min-w-0">
+            <label className="text-[10px] sm:text-xs font-semibold text-indigo-300 uppercase tracking-wide truncate">
               Résultat cible
             </label>
-            <div className="text-3xl font-extrabold text-indigo-400 min-h-[36px] flex items-center break-all">
+            <div className="text-xl sm:text-3xl font-extrabold text-indigo-400 min-h-[28px] sm:min-h-[36px] flex items-center truncate">
               {convertedValue !== '' ? convertedValue : '-'}
             </div>
-            <div className="pt-2 border-t border-indigo-900/50">
+            <div className="pt-1.5 sm:pt-2 border-t border-indigo-900/50">
               <select
                 value={toUnitId}
                 onChange={e => setToUnitId(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 text-indigo-300 font-bold rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full bg-gray-800 border border-gray-600 text-indigo-300 font-bold rounded-lg py-1.5 px-2 sm:py-2 sm:px-3 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 truncate"
               >
                 {currentUnits.map(u => (
                   <option key={u.id} value={u.id}>
@@ -186,85 +188,48 @@ const ConverterContent: React.FC = () => {
       </div>
 
       {/* Equivalences Section */}
-      <div className="bg-gray-800/60 rounded-2xl border border-gray-700/80 p-4 sm:p-6 shadow-xl">
-        <h3 className="text-base sm:text-lg font-bold text-gray-200 uppercase tracking-wider mb-4 border-b border-gray-700 pb-2.5 flex items-center gap-2">
-          <span>📋</span>
-          <span>Équivalences usuelles (pour 1 unité)</span>
-        </h3>
+      <div className="bg-gray-800/60 rounded-2xl border border-gray-700/80 p-3 sm:p-6 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-700 pb-2.5 mb-3">
+          <h3 className="text-xs sm:text-base font-bold text-gray-200 uppercase tracking-wider flex items-center gap-1.5">
+            <span>📋</span>
+            <span>Équivalences usuelles (pour 1)</span>
+          </h3>
 
-        <div className="space-y-6 text-xs sm:text-sm">
-          {/* Speeds */}
-          <div>
-            <h4 className="font-bold text-indigo-400 uppercase tracking-wide mb-2 text-xs">
-              ⚡ Vitesses
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-gray-900/50 p-3 rounded-xl border border-gray-800">
-              {UNITS.speed.map(unit => (
-                <div key={unit.id} className="text-gray-300 bg-gray-800/40 p-2.5 rounded-lg border border-gray-700/40">
-                  <span className="font-extrabold text-white block mb-1">1 {unit.symbol} =</span>
-                  <div className="space-y-0.5 text-gray-400 pl-1">
-                    {UNITS.speed.filter(u => u.id !== unit.id).map(other => {
-                      const val = unit.toBase / other.toBase;
-                      return (
-                        <div key={other.id}>
-                          <span className="font-bold text-indigo-300">{formatEquiv(val)}</span> {other.symbol}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Category Filter Pills */}
+          <div className="flex gap-1 bg-gray-900/80 p-1 rounded-lg w-full sm:w-auto">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setEquivCategory(cat.id)}
+                className={`flex-1 sm:flex-none py-1 px-2 rounded font-bold text-[10px] sm:text-xs transition-all flex items-center justify-center gap-1 ${
+                  equivCategory === cat.id
+                    ? 'bg-indigo-600 text-white shadow'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Distances */}
-          <div>
-            <h4 className="font-bold text-indigo-400 uppercase tracking-wide mb-2 text-xs">
-              📏 Distances & Altitudes
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 bg-gray-900/50 p-3 rounded-xl border border-gray-800">
-              {UNITS.distance.map(unit => (
-                <div key={unit.id} className="text-gray-300 bg-gray-800/40 p-2.5 rounded-lg border border-gray-700/40">
-                  <span className="font-extrabold text-white block mb-1">1 {unit.symbol} =</span>
-                  <div className="space-y-0.5 text-gray-400 pl-1">
-                    {UNITS.distance.filter(u => u.id !== unit.id).map(other => {
-                      const val = unit.toBase / other.toBase;
-                      return (
-                        <div key={other.id}>
-                          <span className="font-bold text-indigo-300">{formatEquiv(val)}</span> {other.symbol}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 bg-gray-900/40 p-2 sm:p-3 rounded-xl border border-gray-800">
+          {UNITS[equivCategory].map(unit => (
+            <div key={unit.id} className="text-gray-300 bg-gray-800/60 p-2 sm:p-2.5 rounded-lg border border-gray-700/40 text-xs sm:text-sm min-w-0">
+              <span className="font-extrabold text-white block mb-1 truncate">1 {unit.symbol} =</span>
+              <div className="space-y-0.5 text-gray-400 pl-1 text-[11px] sm:text-xs">
+                {UNITS[equivCategory].filter(u => u.id !== unit.id).map(other => {
+                  const val = unit.toBase / other.toBase;
+                  return (
+                    <div key={other.id} className="truncate">
+                      <span className="font-bold text-indigo-300">{formatEquiv(val)}</span> {other.symbol}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-
-          {/* Volumes */}
-          <div>
-            <h4 className="font-bold text-indigo-400 uppercase tracking-wide mb-2 text-xs">
-              ⛽ Volumes carburant
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-gray-900/50 p-3 rounded-xl border border-gray-800">
-              {UNITS.volume.map(unit => (
-                <div key={unit.id} className="text-gray-300 bg-gray-800/40 p-2.5 rounded-lg border border-gray-700/40">
-                  <span className="font-extrabold text-white block mb-1">1 {unit.symbol} =</span>
-                  <div className="space-y-0.5 text-gray-400 pl-1">
-                    {UNITS.volume.filter(u => u.id !== unit.id).map(other => {
-                      const val = unit.toBase / other.toBase;
-                      return (
-                        <div key={other.id}>
-                          <span className="font-bold text-indigo-300">{formatEquiv(val)}</span> {other.symbol}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+          ))}
         </div>
       </div>
 

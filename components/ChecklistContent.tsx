@@ -148,9 +148,10 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
   const sectionMatches = useMemo(() => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    if (section.title.toLowerCase().includes(q)) return true;
-    if (section.items?.some(i => i.item.toLowerCase().includes(q) || (i.action && i.action.toLowerCase().includes(q)))) return true;
-    if (section.subsections?.some(sub => sub.title.toLowerCase().includes(q) || sub.items?.some(i => i.item.toLowerCase().includes(q) || (i.action && i.action.toLowerCase().includes(q))))) return true;
+    const str = (val: any) => typeof val === 'string' ? val.toLowerCase() : typeof val === 'number' ? val.toString() : '';
+    if (str(section.title).includes(q)) return true;
+    if (section.items?.some(i => str(i.item).includes(q) || str(i.action).includes(q))) return true;
+    if (section.subsections?.some(sub => str(sub.title).includes(q) || sub.items?.some(i => str(i.item).includes(q) || str(i.action).includes(q)))) return true;
     return false;
   }, [section, searchQuery]);
 
@@ -224,9 +225,11 @@ const ChecklistSectionCard: React.FC<ChecklistSectionCardProps> = ({ section, se
     return null;
   }
 
-  const matchesSearch = (text: string) => {
+  const matchesSearch = (text: any) => {
     if (!searchQuery) return true;
-    return text.toLowerCase().includes(searchQuery.toLowerCase());
+    if (typeof text === 'string') return text.toLowerCase().includes(searchQuery.toLowerCase());
+    if (typeof text === 'number') return text.toString().includes(searchQuery.toLowerCase());
+    return false;
   };
 
   const sectionTitleMatches = section.title && matchesSearch(section.title);
